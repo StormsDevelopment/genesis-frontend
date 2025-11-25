@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Activity, Users, Trophy, CheckCircle2, AlertTriangle, TrendingUp, Shield, Zap } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
@@ -15,9 +16,11 @@ const Index = () => {
             </div>
             <span className="text-xl font-bold text-foreground">Gênesis</span>
           </div>
-          <Button variant="default" className="bg-primary hover:bg-primary/90">
-            Acessar Plataforma
-          </Button>
+          <Link to="/dashboard">
+            <Button variant="default" className="bg-primary hover:bg-primary/90">
+              Acessar Plataforma
+            </Button>
+          </Link>
         </div>
       </header>
 
@@ -39,9 +42,11 @@ const Index = () => {
               Digitalize, gerencie e gamifique os checklists hospitalares. Promova a cultura de auditoria interna e melhoria contínua com um sistema transparente de pontuação.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all">
-                Começar Agora
-              </Button>
+              <Link to="/dashboard">
+                <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all">
+                  Começar Agora
+                </Button>
+              </Link>
               <Button size="lg" variant="outline" className="border-2 hover:bg-muted">
                 Conhecer Funcionalidades
               </Button>
@@ -282,9 +287,11 @@ const Index = () => {
           <p className="text-muted-foreground text-lg mb-8 max-w-2xl mx-auto">
             Implemente a excelência operacional com uma plataforma completa de gestão e gamificação
           </p>
-          <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl hover:shadow-2xl transition-all">
-            Solicitar Demonstração
-          </Button>
+          <Link to="/dashboard">
+            <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl hover:shadow-2xl transition-all">
+              Solicitar Demonstração
+            </Button>
+          </Link>
         </div>
       </section>
 
