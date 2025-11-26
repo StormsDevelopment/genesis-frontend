@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -68,26 +69,36 @@ const Dashboard = () => {
         </div>
 
         <nav className="flex-1 p-4 space-y-2">
-          <Button variant="ghost" className="w-full justify-start gap-2 bg-primary/10 text-primary hover:bg-primary/20">
-            <Trophy className="w-4 h-4" />
-            Dashboard
+          <Button variant="ghost" className="w-full justify-start gap-2 bg-primary/10 text-primary hover:bg-primary/20" asChild>
+            <Link to="/dashboard">
+              <Trophy className="w-4 h-4" />
+              Dashboard
+            </Link>
           </Button>
-          <Button variant="ghost" className="w-full justify-start gap-2">
-            <FileText className="w-4 h-4" />
-            Checklists
+          <Button variant="ghost" className="w-full justify-start gap-2" asChild>
+            <Link to="/checklists">
+              <FileText className="w-4 h-4" />
+              Checklists
+            </Link>
           </Button>
-          <Button variant="ghost" className="w-full justify-start gap-2">
-            <Users className="w-4 h-4" />
-            Equipes
+          <Button variant="ghost" className="w-full justify-start gap-2" asChild>
+            <Link to="/teams">
+              <Users className="w-4 h-4" />
+              Equipes
+            </Link>
           </Button>
-          <Button variant="ghost" className="w-full justify-start gap-2">
-            <Bell className="w-4 h-4" />
-            Notificações
-            <Badge className="ml-auto bg-destructive text-destructive-foreground">3</Badge>
+          <Button variant="ghost" className="w-full justify-start gap-2 relative" asChild>
+            <Link to="/notifications">
+              <Bell className="w-4 h-4" />
+              Notificações
+              <Badge className="ml-auto bg-destructive text-destructive-foreground">3</Badge>
+            </Link>
           </Button>
-          <Button variant="ghost" className="w-full justify-start gap-2">
-            <TrendingUp className="w-4 h-4" />
-            Relatórios
+          <Button variant="ghost" className="w-full justify-start gap-2" asChild>
+            <Link to="/reports">
+              <TrendingUp className="w-4 h-4" />
+              Relatórios
+            </Link>
           </Button>
         </nav>
 
