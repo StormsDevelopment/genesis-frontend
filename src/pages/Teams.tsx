@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-  ArrowLeft, 
   Plus, 
   Search, 
   Mail, 
@@ -15,8 +13,14 @@ import {
   MoreVertical,
   TrendingUp,
   Award,
-  Target
+  Target,
+  Users,
+  Building2,
+  UserPlus,
+  Settings
 } from "lucide-react";
+import { AppLayout } from "@/components/layout/AppLayout";
+import { useRole } from "@/contexts/RoleContext";
 
 interface TeamMember {
   id: string;
@@ -33,6 +37,16 @@ interface TeamMember {
   joinDate: string;
 }
 
+interface Sector {
+  id: string;
+  name: string;
+  coordinator: string;
+  membersCount: number;
+  score: number;
+  completionRate: number;
+  status: "active" | "inactive";
+}
+
 const mockTeamMembers: TeamMember[] = [
   {
     id: "1",
@@ -40,7 +54,7 @@ const mockTeamMembers: TeamMember[] = [
     email: "joao.silva@hospital.com",
     phone: "(11) 98765-4321",
     role: "collaborator",
-    sector: "UTI",
+    sector: "Cardiologia",
     status: "active",
     tasksCompleted: 127,
     totalTasks: 135,
@@ -50,10 +64,10 @@ const mockTeamMembers: TeamMember[] = [
   },
   {
     id: "2",
-    name: "Maria Santos",
-    email: "maria.santos@hospital.com",
+    name: "Ana Oliveira",
+    email: "ana.oliveira@hospital.com",
     phone: "(11) 98765-4322",
-    role: "coordinator",
+    role: "collaborator",
     sector: "Cardiologia",
     status: "active",
     tasksCompleted: 98,
@@ -68,7 +82,7 @@ const mockTeamMembers: TeamMember[] = [
     email: "pedro.costa@hospital.com",
     phone: "(11) 98765-4323",
     role: "collaborator",
-    sector: "Emergência",
+    sector: "Cardiologia",
     status: "active",
     tasksCompleted: 156,
     totalTasks: 160,
@@ -78,11 +92,11 @@ const mockTeamMembers: TeamMember[] = [
   },
   {
     id: "4",
-    name: "Ana Lima",
-    email: "ana.lima@hospital.com",
+    name: "Lucia Ferreira",
+    email: "lucia.ferreira@hospital.com",
     phone: "(11) 98765-4324",
     role: "collaborator",
-    sector: "Pediatria",
+    sector: "Cardiologia",
     status: "inactive",
     tasksCompleted: 45,
     totalTasks: 78,
@@ -90,40 +104,44 @@ const mockTeamMembers: TeamMember[] = [
     level: 2,
     joinDate: "2024-08-05"
   },
-  {
-    id: "5",
-    name: "Carlos Mendes",
-    email: "carlos.mendes@hospital.com",
-    phone: "(11) 98765-4325",
-    role: "pmo",
-    sector: "Administração",
-    status: "active",
-    tasksCompleted: 203,
-    totalTasks: 210,
-    points: 2030,
-    level: 8,
-    joinDate: "2023-05-01"
-  },
+];
+
+const mockSectors: Sector[] = [
+  { id: "1", name: "Cardiologia", coordinator: "Dra. Maria Santos", membersCount: 15, score: 3845, completionRate: 94, status: "active" },
+  { id: "2", name: "UTI", coordinator: "Dr. Paulo Lima", membersCount: 22, score: 3720, completionRate: 91, status: "active" },
+  { id: "3", name: "Emergência", coordinator: "Dra. Clara Mendes", membersCount: 28, score: 3580, completionRate: 88, status: "active" },
+  { id: "4", name: "Pediatria", coordinator: "Dr. Ricardo Alves", membersCount: 12, score: 3420, completionRate: 95, status: "active" },
+  { id: "5", name: "Ortopedia", coordinator: "Dra. Fernanda Dias", membersCount: 10, score: 3210, completionRate: 93, status: "active" },
+  { id: "6", name: "Laboratório", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
 ];
 
 export default function Teams() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState("members");
+  const { role, rolePermissions, userSector } = useRole();
+
+  const getSubtitle = () => {
+    switch (role) {
+      case "pmo": return "Gerencie todos os setores e usuários";
+      case "coordinator": return `Gerencie sua equipe do setor ${userSector}`;
+      default: return "Visualize membros da equipe";
+    }
+  };
+
+  // Filter based on role
+  const filteredMembers = role === "pmo" 
+    ? mockTeamMembers 
+    : mockTeamMembers.filter(m => m.sector === userSector || m.sector === "Cardiologia");
 
   const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+    return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
   };
 
   const getCompletionRate = (completed: number, total: number) => {
     return Math.round((completed / total) * 100);
   };
 
-  const getRoleBadge = (role: string) => {
+  const getRoleBadge = (memberRole: string) => {
     const variants = {
       pmo: "bg-gold/10 text-gold border-gold/30",
       coordinator: "bg-primary/10 text-primary border-primary/30",
@@ -135,32 +153,31 @@ export default function Teams() {
       collaborator: "Colaborador"
     };
     return (
-      <Badge variant="outline" className={variants[role as keyof typeof variants]}>
-        {labels[role as keyof typeof labels]}
+      <Badge variant="outline" className={variants[memberRole as keyof typeof variants]}>
+        {labels[memberRole as keyof typeof labels]}
       </Badge>
     );
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link to="/dashboard">
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="w-5 h-5" />
+    <AppLayout title="Equipes" subtitle={getSubtitle()}>
+      <div className="p-6 space-y-6">
+        {/* Header Actions */}
+        <div className="flex justify-between items-center">
+          <div className="flex gap-2">
+            {role === "pmo" && (
+              <Button className="gap-2 bg-primary hover:bg-primary/90">
+                <Building2 className="w-4 h-4" />
+                Novo Setor
               </Button>
-            </Link>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Equipes</h1>
-              <p className="text-muted-foreground">Gerencie membros e setores</p>
-            </div>
+            )}
           </div>
-          <Button className="gap-2 bg-primary hover:bg-primary/90">
-            <Plus className="w-4 h-4" />
-            Adicionar Membro
-          </Button>
+          {(role === "pmo" || role === "coordinator") && (
+            <Button className="gap-2 bg-primary hover:bg-primary/90">
+              <UserPlus className="w-4 h-4" />
+              {role === "coordinator" ? "Adicionar Colaborador" : "Adicionar Usuário"}
+            </Button>
+          )}
         </div>
 
         {/* Stats */}
@@ -168,11 +185,13 @@ export default function Teams() {
           <Card className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-primary/10">
-                <Target className="w-5 h-5 text-primary" />
+                <Users className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Total de Membros</p>
-                <p className="text-2xl font-bold text-foreground">{mockTeamMembers.length}</p>
+                <p className="text-sm text-muted-foreground">
+                  {role === "pmo" ? "Total de Membros" : "Membros da Equipe"}
+                </p>
+                <p className="text-2xl font-bold text-foreground">{filteredMembers.length}</p>
               </div>
             </div>
           </Card>
@@ -184,20 +203,20 @@ export default function Teams() {
               <div>
                 <p className="text-sm text-muted-foreground">Membros Ativos</p>
                 <p className="text-2xl font-bold text-foreground">
-                  {mockTeamMembers.filter(m => m.status === "active").length}
+                  {filteredMembers.filter(m => m.status === "active").length}
                 </p>
               </div>
             </div>
           </Card>
           <Card className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-warning/10">
-                <Award className="w-5 h-5 text-warning" />
+              <div className="p-2 rounded-lg bg-gold/10">
+                <Award className="w-5 h-5 text-gold" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Pontos Totais</p>
                 <p className="text-2xl font-bold text-foreground">
-                  {mockTeamMembers.reduce((acc, m) => acc + m.points, 0).toLocaleString()}
+                  {filteredMembers.reduce((acc, m) => acc + m.points, 0).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -208,8 +227,12 @@ export default function Teams() {
                 <Target className="w-5 h-5 text-secondary-foreground" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Taxa Média</p>
-                <p className="text-2xl font-bold text-foreground">94%</p>
+                <p className="text-sm text-muted-foreground">
+                  {role === "pmo" ? "Setores Ativos" : "Taxa Média"}
+                </p>
+                <p className="text-2xl font-bold text-foreground">
+                  {role === "pmo" ? mockSectors.filter(s => s.status === "active").length : "94%"}
+                </p>
               </div>
             </div>
           </Card>
@@ -220,7 +243,7 @@ export default function Teams() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar membros..."
+              placeholder={role === "pmo" ? "Buscar membros ou setores..." : "Buscar membros da equipe..."}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -231,15 +254,17 @@ export default function Teams() {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
-            <TabsTrigger value="all">Todos</TabsTrigger>
-            <TabsTrigger value="pmo">PMO</TabsTrigger>
-            <TabsTrigger value="coordinator">Coordenadores</TabsTrigger>
-            <TabsTrigger value="collaborator">Colaboradores</TabsTrigger>
+            <TabsTrigger value="members">
+              {role === "coordinator" ? "Minha Equipe" : "Membros"}
+            </TabsTrigger>
+            {role === "pmo" && <TabsTrigger value="sectors">Setores</TabsTrigger>}
+            {role === "pmo" && <TabsTrigger value="coordinators">Coordenadores</TabsTrigger>}
           </TabsList>
 
-          <TabsContent value={activeTab} className="mt-6">
+          {/* Members Tab */}
+          <TabsContent value="members" className="mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {mockTeamMembers.map((member) => {
+              {filteredMembers.map((member) => {
                 const completionRate = getCompletionRate(member.tasksCompleted, member.totalTasks);
                 
                 return (
@@ -270,9 +295,11 @@ export default function Teams() {
                               <Badge variant="outline">Nível {member.level}</Badge>
                             </div>
                           </div>
-                          <Button variant="ghost" size="icon">
-                            <MoreVertical className="w-4 h-4" />
-                          </Button>
+                          {(role === "pmo" || role === "coordinator") && (
+                            <Button variant="ghost" size="icon">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          )}
                         </div>
 
                         <div className="space-y-2 text-sm text-muted-foreground">
@@ -308,6 +335,17 @@ export default function Teams() {
                             <p className="text-sm font-semibold text-foreground">{completionRate}%</p>
                           </div>
                         </div>
+
+                        {role === "coordinator" && (
+                          <div className="flex gap-2 pt-3">
+                            <Button size="sm" variant="outline" className="flex-1">
+                              Atribuir Tarefa
+                            </Button>
+                            <Button size="sm" variant="ghost">
+                              <Settings className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </Card>
@@ -315,8 +353,98 @@ export default function Teams() {
               })}
             </div>
           </TabsContent>
+
+          {/* Sectors Tab (PMO Only) */}
+          {role === "pmo" && (
+            <TabsContent value="sectors" className="mt-6">
+              <div className="space-y-4">
+                {mockSectors.map((sector, index) => (
+                  <Card key={sector.id} className="p-6 hover:border-primary/50 transition-all">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                          index === 0 ? "bg-gradient-to-r from-gold to-warning text-gold-foreground" :
+                          index === 1 ? "bg-gradient-to-r from-muted to-border text-foreground" :
+                          index === 2 ? "bg-gradient-to-r from-amber-700 to-amber-500 text-white" :
+                          "bg-muted text-foreground"
+                        }`}>
+                          {index + 1}
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-foreground">{sector.name}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Coordenador: {sector.coordinator}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-6">
+                        <div className="text-center">
+                          <p className="text-xs text-muted-foreground">Membros</p>
+                          <p className="text-lg font-bold text-foreground">{sector.membersCount}</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-muted-foreground">Taxa</p>
+                          <p className="text-lg font-bold text-foreground">{sector.completionRate}%</p>
+                        </div>
+                        <Badge className="bg-primary/10 text-primary border-primary/30 font-bold text-lg px-3 py-1">
+                          {sector.score} pts
+                        </Badge>
+                        <Button variant="ghost" size="icon">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+          )}
+
+          {/* Coordinators Tab (PMO Only) */}
+          {role === "pmo" && (
+            <TabsContent value="coordinators" className="mt-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {mockSectors.map((sector) => (
+                  <Card key={sector.id} className="p-6 hover:border-primary/50 transition-all">
+                    <div className="flex items-start gap-4">
+                      <Avatar className="w-14 h-14 bg-gradient-to-br from-primary to-secondary">
+                        <AvatarFallback className="bg-transparent text-primary-foreground font-semibold">
+                          {sector.coordinator.split(" ").map(n => n[0]).join("").slice(0, 2)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-foreground mb-1">
+                          {sector.coordinator}
+                        </h3>
+                        <div className="flex items-center gap-2 mb-3">
+                          <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                            Coordenador
+                          </Badge>
+                          <Badge variant="outline">{sector.name}</Badge>
+                        </div>
+                        <div className="grid grid-cols-3 gap-4 pt-3 border-t border-border">
+                          <div>
+                            <p className="text-xs text-muted-foreground">Equipe</p>
+                            <p className="font-semibold text-foreground">{sector.membersCount}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground">Score</p>
+                            <p className="font-semibold text-primary">{sector.score}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground">Taxa</p>
+                            <p className="font-semibold text-foreground">{sector.completionRate}%</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
+          )}
         </Tabs>
       </div>
-    </div>
+    </AppLayout>
   );
 }
