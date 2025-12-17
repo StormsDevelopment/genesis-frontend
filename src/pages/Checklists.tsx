@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-  ArrowLeft, 
   Plus, 
   Search, 
   Filter, 
@@ -16,8 +14,13 @@ import {
   AlertCircle,
   MoreVertical,
   Download,
-  Upload
+  Upload,
+  Eye,
+  Edit,
+  Trash2
 } from "lucide-react";
+import { AppLayout } from "@/components/layout/AppLayout";
+import { useRole } from "@/contexts/RoleContext";
 
 interface ChecklistItem {
   id: string;
@@ -30,6 +33,8 @@ interface ChecklistItem {
   dueDate: string;
   completedDate?: string;
   points: number;
+  isPmoValidated: boolean;
+  isProcessActivity: boolean;
 }
 
 const mockChecklists: ChecklistItem[] = [
@@ -43,7 +48,9 @@ const mockChecklists: ChecklistItem[] = [
     assignee: "João Silva",
     dueDate: "2025-11-25",
     completedDate: "2025-11-25",
-    points: 50
+    points: 10,
+    isPmoValidated: true,
+    isProcessActivity: true
   },
   {
     id: "2",
@@ -54,7 +61,9 @@ const mockChecklists: ChecklistItem[] = [
     sector: "Cardiologia",
     assignee: "Maria Santos",
     dueDate: "2025-11-28",
-    points: 30
+    points: 10,
+    isPmoValidated: true,
+    isProcessActivity: true
   },
   {
     id: "3",
@@ -65,24 +74,57 @@ const mockChecklists: ChecklistItem[] = [
     sector: "Centro Cirúrgico",
     assignee: "Pedro Costa",
     dueDate: "2025-11-24",
-    points: 40
+    points: 10,
+    isPmoValidated: false,
+    isProcessActivity: false
   },
   {
     id: "4",
+    title: "Conferência de Medicamentos",
+    description: "Verificar estoque e validade dos medicamentos",
+    status: "pending",
+    priority: "low",
+    sector: "Farmácia",
+    assignee: "Ana Lima",
+    dueDate: "2025-12-01",
+    points: 10,
+    isPmoValidated: true,
+    isProcessActivity: true
+  },
+  {
+    id: "5",
     title: "Treinamento de Equipe",
     description: "Sessão de atualização sobre novos protocolos",
     status: "pending",
-    priority: "low",
+    priority: "medium",
     sector: "Emergência",
-    assignee: "Ana Lima",
-    dueDate: "2025-12-01",
-    points: 20
+    assignee: "Carlos Mendes",
+    dueDate: "2025-12-05",
+    points: 0,
+    isPmoValidated: false,
+    isProcessActivity: false
   },
 ];
 
 export default function Checklists() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const { role, rolePermissions, userSector } = useRole();
+
+  const getSubtitle = () => {
+    switch (role) {
+      case "pmo": return "Validar e gerenciar checklists de todos os setores";
+      case "coordinator": return `Gerencie o checklist do setor ${userSector}`;
+      case "collaborator": return "Visualize e complete suas atividades";
+    }
+  };
+
+  // Filter checklists based on role
+  const filteredChecklists = mockChecklists.filter(checklist => {
+    if (role === "pmo") return true;
+    if (role === "coordinator") return checklist.sector === userSector || checklist.sector === "Cardiologia";
+    return checklist.assignee === "João Silva"; // Collaborator sees only their tasks
+  });
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -136,36 +178,67 @@ export default function Checklists() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link to="/dashboard">
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            </Link>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Checklists</h1>
-              <p className="text-muted-foreground">Gerencie todas as tarefas e verificações</p>
-            </div>
-          </div>
+    <AppLayout title="Checklists" subtitle={getSubtitle()}>
+      <div className="p-6 space-y-6">
+        {/* Actions Bar */}
+        <div className="flex flex-wrap gap-4 justify-between items-center">
           <div className="flex gap-2">
-            <Button variant="outline" className="gap-2">
-              <Upload className="w-4 h-4" />
-              Importar
-            </Button>
-            <Button variant="outline" className="gap-2">
-              <Download className="w-4 h-4" />
-              Exportar
-            </Button>
+            {rolePermissions.canImportChecklists && (
+              <>
+                <Button variant="outline" className="gap-2">
+                  <Upload className="w-4 h-4" />
+                  Importar
+                </Button>
+                <Button variant="outline" className="gap-2">
+                  <Download className="w-4 h-4" />
+                  Exportar
+                </Button>
+              </>
+            )}
+          </div>
+          {(role === "pmo" || role === "coordinator") && (
             <Button className="gap-2 bg-primary hover:bg-primary/90">
               <Plus className="w-4 h-4" />
-              Novo Checklist
+              Nova Atividade
+              {role === "coordinator" && <Badge className="ml-1 bg-gold text-gold-foreground">+100 pts</Badge>}
             </Button>
-          </div>
+          )}
         </div>
+
+        {/* PMO Validation Section */}
+        {role === "pmo" && (
+          <Card className="p-6 border-gold/30 bg-gold/5">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gold">
+              <CheckCircle2 className="w-5 h-5" />
+              Atividades Pendentes de Validação
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Marque as atividades como "Atividade do Processo" para que sejam elegíveis para pontuação (+10 pts cada).
+            </p>
+            <div className="space-y-3">
+              {mockChecklists.filter(c => !c.isPmoValidated).map(checklist => (
+                <div key={checklist.id} className="flex items-center justify-between p-4 rounded-lg border border-border bg-card">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-foreground">{checklist.title}</span>
+                      <Badge variant="outline">{checklist.sector}</Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{checklist.description}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" className="text-success border-success/30 hover:bg-success/10">
+                      <CheckCircle2 className="w-4 h-4 mr-1" />
+                      Validar
+                    </Button>
+                    <Button size="sm" variant="ghost">
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
 
         {/* Filters */}
         <Card className="p-4">
@@ -173,7 +246,7 @@ export default function Checklists() {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar checklists..."
+                placeholder="Buscar atividades..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -189,30 +262,41 @@ export default function Checklists() {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
-            <TabsTrigger value="all">Todos ({mockChecklists.length})</TabsTrigger>
+            <TabsTrigger value="all">Todos ({filteredChecklists.length})</TabsTrigger>
             <TabsTrigger value="pending">
-              Pendentes ({mockChecklists.filter(c => c.status === "pending").length})
+              Pendentes ({filteredChecklists.filter(c => c.status === "pending").length})
             </TabsTrigger>
             <TabsTrigger value="in-progress">
-              Em Andamento ({mockChecklists.filter(c => c.status === "in-progress").length})
+              Em Andamento ({filteredChecklists.filter(c => c.status === "in-progress").length})
             </TabsTrigger>
             <TabsTrigger value="completed">
-              Concluídos ({mockChecklists.filter(c => c.status === "completed").length})
+              Concluídos ({filteredChecklists.filter(c => c.status === "completed").length})
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value={activeTab} className="mt-6">
             <div className="space-y-4">
-              {mockChecklists.map((checklist) => (
+              {filteredChecklists.map((checklist) => (
                 <Card key={checklist.id} className="p-6 hover:border-primary/50 transition-all">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-4 flex-1">
-                      {getStatusIcon(checklist.status)}
+                      {role === "collaborator" && checklist.status === "pending" ? (
+                        <button className="mt-1 w-6 h-6 rounded-full border-2 border-muted-foreground hover:border-primary hover:bg-primary/10 transition-all" />
+                      ) : (
+                        getStatusIcon(checklist.status)
+                      )}
                       <div className="flex-1 space-y-3">
                         <div>
-                          <h3 className="text-lg font-semibold text-foreground mb-1">
-                            {checklist.title}
-                          </h3>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-lg font-semibold text-foreground">
+                              {checklist.title}
+                            </h3>
+                            {checklist.isProcessActivity && (
+                              <Badge className="bg-primary/10 text-primary border-primary/30 text-xs">
+                                Atividade do Processo
+                              </Badge>
+                            )}
+                          </div>
                           <p className="text-sm text-muted-foreground">
                             {checklist.description}
                           </p>
@@ -220,22 +304,44 @@ export default function Checklists() {
                         <div className="flex flex-wrap items-center gap-3">
                           {getStatusBadge(checklist.status)}
                           {getPriorityBadge(checklist.priority)}
-                          <Badge variant="outline">{checklist.sector}</Badge>
+                          {role === "pmo" && <Badge variant="outline">{checklist.sector}</Badge>}
                           <span className="text-sm text-muted-foreground">
                             Responsável: {checklist.assignee}
                           </span>
                           <span className="text-sm text-muted-foreground">
                             Prazo: {new Date(checklist.dueDate).toLocaleDateString('pt-BR')}
                           </span>
-                          <Badge className="bg-primary/10 text-primary border-primary/30">
-                            {checklist.points} pontos
-                          </Badge>
+                          {checklist.isProcessActivity && (
+                            <Badge className="bg-success/10 text-success border-success/30">
+                              +{checklist.points} pts
+                            </Badge>
+                          )}
                         </div>
                       </div>
                     </div>
-                    <Button variant="ghost" size="icon">
-                      <MoreVertical className="w-4 h-4" />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      {role === "collaborator" && checklist.status === "pending" && (
+                        <Button size="sm" className="bg-success hover:bg-success/90">
+                          <CheckCircle2 className="w-4 h-4 mr-1" />
+                          Validar
+                        </Button>
+                      )}
+                      {role === "coordinator" && (
+                        <>
+                          <Button variant="ghost" size="icon">
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="text-destructive">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </>
+                      )}
+                      {role === "pmo" && (
+                        <Button variant="ghost" size="icon">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </Card>
               ))}
@@ -243,6 +349,6 @@ export default function Checklists() {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </AppLayout>
   );
 }
