@@ -19,7 +19,7 @@ const mockNotifications: Notification[] = [
   {
     id: "1",
     type: "absence",
-    fromSector: "Emergência",
+    fromSector: "UTI Adulto",
     toSector: "Farmácia",
     description: "Falta de verificação de estoque de medicamentos de emergência no turno noturno",
     points: -100,
@@ -30,8 +30,8 @@ const mockNotifications: Notification[] = [
   {
     id: "2",
     type: "alert",
-    fromSector: "UTI",
-    toSector: "Cardiologia",
+    fromSector: "UTI Adulto",
+    toSector: "Centro Diagnóstico",
     description: "Equipamento de monitoramento cardíaco não calibrado conforme protocolo",
     points: -50,
     status: "disputed",
@@ -40,7 +40,7 @@ const mockNotifications: Notification[] = [
   {
     id: "3",
     type: "audit",
-    fromSector: "Radiologia",
+    fromSector: "Pediatria",
     description: "Identificação de não conformidade no setor de Ortopedia",
     points: 50,
     status: "accepted",

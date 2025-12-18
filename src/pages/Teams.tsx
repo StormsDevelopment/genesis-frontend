@@ -107,12 +107,31 @@ const mockTeamMembers: TeamMember[] = [
 ];
 
 const mockSectors: Sector[] = [
-  { id: "1", name: "Cardiologia", coordinator: "Dra. Maria Santos", membersCount: 15, score: 3845, completionRate: 94, status: "active" },
-  { id: "2", name: "UTI", coordinator: "Dr. Paulo Lima", membersCount: 22, score: 3720, completionRate: 91, status: "active" },
-  { id: "3", name: "Emergência", coordinator: "Dra. Clara Mendes", membersCount: 28, score: 3580, completionRate: 88, status: "active" },
-  { id: "4", name: "Pediatria", coordinator: "Dr. Ricardo Alves", membersCount: 12, score: 3420, completionRate: 95, status: "active" },
-  { id: "5", name: "Ortopedia", coordinator: "Dra. Fernanda Dias", membersCount: 10, score: 3210, completionRate: 93, status: "active" },
-  { id: "6", name: "Laboratório", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "1", name: "Ambulatório", coordinator: "Dra. Maria Santos", membersCount: 15, score: 3845, completionRate: 94, status: "active" },
+  { id: "2", name: "Atendimento PS", coordinator: "Dr. Paulo Lima", membersCount: 22, score: 3720, completionRate: 91, status: "active" },
+  { id: "3", name: "Central de Autorização", coordinator: "Dra. Clara Mendes", membersCount: 28, score: 3580, completionRate: 88, status: "active" },
+  { id: "4", name: "Central de Internação", coordinator: "Dr. Ricardo Alves", membersCount: 12, score: 3420, completionRate: 95, status: "active" },
+  { id: "5", name: "Centro Cirúrgico", coordinator: "Dra. Fernanda Dias", membersCount: 10, score: 3210, completionRate: 93, status: "active" },
+  { id: "6", name: "Centro Diagnóstico", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "7", name: "Controladoria", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "8", name: "Farmácia e Suprimentos", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "9", name: "Faturamento", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "10", name: "Financeiro", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "11", name: "Gestão de Leitos", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "12", name: "Higienização", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "13", name: "Hotelaria", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "14", name: "IRT", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "15", name: "Laboratório", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "16", name: "Nutrição", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "17", name: "Oncologia", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "18", name: "Pediatria", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "19", name: "Pré-Faturamento", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "20", name: "Pronto-Socorro", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "21", name: "Regra de Negócios", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "21", name: "Transporte", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "22", name: "Unidade de Internação", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "23", name: "UTI Adulto", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
+  { id: "24", name: "UTINP", coordinator: "Dr. Marcos Souza", membersCount: 18, score: 2980, completionRate: 89, status: "active" },
 ];
 
 export default function Teams() {
