@@ -136,8 +136,8 @@ const mockSectors: Sector[] = [
 
 export default function Teams() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("members");
   const { role, rolePermissions, userSector } = useRole();
+  const [activeTab, setActiveTab] = useState(role === "pmo" ? "sectors" : "members");
 
   const getSubtitle = () => {
     switch (role) {
@@ -273,11 +273,11 @@ export default function Teams() {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
+            {role === "pmo" && <TabsTrigger value="sectors">Setores</TabsTrigger>}
+            {role === "pmo" && <TabsTrigger value="coordinators">Coordenadores</TabsTrigger>}
             <TabsTrigger value="members">
               {role === "coordinator" ? "Minha Equipe" : "Membros"}
             </TabsTrigger>
-            {role === "pmo" && <TabsTrigger value="sectors">Setores</TabsTrigger>}
-            {role === "pmo" && <TabsTrigger value="coordinators">Coordenadores</TabsTrigger>}
           </TabsList>
 
           {/* Members Tab */}

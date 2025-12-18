@@ -2,16 +2,16 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
-  Activity, 
-  Trophy, 
+import {
+  Activity,
+  Trophy,
   Users,
   Bell,
   FileText,
@@ -68,7 +68,7 @@ export function AppLayout({ children, title, subtitle }: AppLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="h-screen bg-background flex">
       {/* Sidebar */}
       <aside className={`${sidebarOpen ? 'w-72' : 'w-0'} transition-all duration-300 border-r border-border bg-card flex flex-col overflow-hidden`}>
         <div className="p-6 border-b border-border">
@@ -81,7 +81,7 @@ export function AppLayout({ children, title, subtitle }: AppLayoutProps) {
               <p className="text-xs text-muted-foreground">Hospital Management</p>
             </div>
           </div>
-          
+
           {/* Role Selector - For Demo */}
           <div className="mb-4">
             <label className="text-xs text-muted-foreground block mb-2">Visualizar como:</label>
@@ -111,14 +111,13 @@ export function AppLayout({ children, title, subtitle }: AppLayoutProps) {
           {filteredNavItems.map(item => {
             const isActive = location.pathname === item.path;
             return (
-              <Button 
+              <Button
                 key={item.path}
-                variant="ghost" 
-                className={`w-full justify-start gap-3 h-11 ${
-                  isActive 
-                    ? 'bg-primary/10 text-primary hover:bg-primary/20 font-semibold' 
+                variant="ghost"
+                className={`w-full justify-start gap-3 h-11 ${isActive
+                    ? 'bg-primary/10 text-primary hover:bg-primary/20 font-semibold'
                     : 'hover:bg-muted'
-                }`} 
+                  }`}
                 asChild
               >
                 <Link to={item.path}>
@@ -158,8 +157,8 @@ export function AppLayout({ children, title, subtitle }: AppLayoutProps) {
         {/* Header */}
         <header className="border-b border-border bg-card/50 backdrop-blur-sm p-4 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
@@ -171,12 +170,6 @@ export function AppLayout({ children, title, subtitle }: AppLayoutProps) {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" className="gap-2" asChild>
-              <Link to="/notifications">
-                <Bell className="w-4 h-4" />
-                <Badge className="bg-destructive text-destructive-foreground px-1.5 py-0 text-xs">3</Badge>
-              </Link>
-            </Button>
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-primary-foreground font-semibold shadow-md">
               {getInitials(userName)}
             </div>

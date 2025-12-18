@@ -280,11 +280,11 @@ export default function Reports() {
                 <h3 className="text-xl font-bold text-foreground mb-4">Top 5 Setores</h3>
                 <div className="space-y-3">
                   {[
-                    { sector: "Cardiologia", points: 3845, tasks: 127, rate: 96 },
-                    { sector: "UTI", points: 3720, tasks: 115, rate: 94 },
-                    { sector: "Emergência", points: 3580, tasks: 142, rate: 91 },
+                    { sector: "Oncologia", points: 3845, tasks: 127, rate: 96 },
+                    { sector: "Faturamento", points: 3720, tasks: 115, rate: 94 },
+                    { sector: "UTI Adulto", points: 3580, tasks: 142, rate: 91 },
                     { sector: "Pediatria", points: 3420, tasks: 98, rate: 95 },
-                    { sector: "Ortopedia", points: 3210, tasks: 89, rate: 93 },
+                    { sector: "Central de Internação", points: 3210, tasks: 89, rate: 93 },
                   ].map((sector, index) => (
                     <div key={sector.sector} className="flex items-center gap-4 p-4 rounded-lg border border-border hover:border-primary/50 transition-all">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${

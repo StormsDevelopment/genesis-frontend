@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
+import {
   Bell,
   AlertCircle,
   CheckCircle2,
@@ -116,7 +116,7 @@ const mockNotifications: Notification[] = [
 ];
 
 const sectors = [
-  "UTI", "Cardiologia", "Emergência", "Laboratório", "Farmácia", 
+  "UTI", "Cardiologia", "Emergência", "Laboratório", "Farmácia",
   "Pediatria", "Ortopedia", "Centro Cirúrgico", "Radiologia"
 ];
 
@@ -218,94 +218,6 @@ export default function Notifications() {
   return (
     <AppLayout title="Notificações" subtitle={getSubtitle()}>
       <div className="p-6 space-y-6">
-        {/* Header Actions */}
-        <div className="flex flex-wrap gap-4 justify-between items-center">
-          <div className="flex gap-2">
-            <Button variant="outline" className="gap-2">
-              <CheckCircle2 className="w-4 h-4" />
-              Marcar Todas como Lidas
-            </Button>
-            <Button variant="ghost" size="icon">
-              <Settings className="w-4 h-4" />
-            </Button>
-          </div>
-          {rolePermissions.canReportErrors && (
-            <Button 
-              className="gap-2 bg-destructive hover:bg-destructive/90"
-              onClick={() => setShowReportForm(!showReportForm)}
-            >
-              <AlertCircle className="w-4 h-4" />
-              Reportar Erro
-              <Badge className="ml-1 bg-success text-success-foreground">+50 pts</Badge>
-            </Button>
-          )}
-        </div>
-
-        {/* Report Error Form */}
-        {showReportForm && (
-          <Card className="p-6 border-destructive/30 bg-destructive/5">
-            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-destructive">
-              <AlertCircle className="w-5 h-5" />
-              Reportar Erro em Outro Setor
-            </h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Ao reportar um erro, seu setor ganha +50 pontos de auditoria. O setor notificado pode reconhecer a falha ou contestar (disputa será julgada pelo PMO).
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">Setor Notificado</label>
-                <Select value={selectedSector} onValueChange={setSelectedSector}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o setor" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {sectors.filter(s => s !== userSector && s !== "Cardiologia").map(sector => (
-                      <SelectItem key={sector} value={sector}>{sector}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-sm font-medium mb-2 block">Tipo de Erro</label>
-                <Select value={errorType} onValueChange={setErrorType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o tipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="alert">Alerta - Erro já estava no checklist (-50 pts)</SelectItem>
-                    <SelectItem value="absence">Ausência - Erro não estava no checklist (-100 pts)</SelectItem>
-                    <SelectItem value="aggravation">Agravamento - Erro recorrente (-150 pts)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="mb-4">
-              <label className="text-sm font-medium mb-2 block">Descrição do Erro</label>
-              <Textarea 
-                placeholder="Descreva detalhadamente o erro encontrado..."
-                value={errorDescription}
-                onChange={(e) => setErrorDescription(e.target.value)}
-                rows={3}
-              />
-            </div>
-            <div className="mb-4">
-              <label className="text-sm font-medium mb-2 block">Evidência (opcional)</label>
-              <Button variant="outline" className="gap-2">
-                <Upload className="w-4 h-4" />
-                Anexar Arquivo
-              </Button>
-            </div>
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setShowReportForm(false)}>
-                Cancelar
-              </Button>
-              <Button className="gap-2 bg-destructive hover:bg-destructive/90">
-                <Send className="w-4 h-4" />
-                Enviar Notificação
-              </Button>
-            </div>
-          </Card>
-        )}
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -359,33 +271,111 @@ export default function Notifications() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
-            <TabsTrigger value="all">Todas ({mockNotifications.length})</TabsTrigger>
-            <TabsTrigger value="unread">Não Lidas ({unreadCount})</TabsTrigger>
-            <TabsTrigger value="errors">Erros</TabsTrigger>
-            {(role === "pmo" || role === "coordinator") && (
-              <TabsTrigger value="disputes">Disputas ({disputeCount})</TabsTrigger>
+
+          <div className="flex flex-row pb-2 justify-between">
+            <TabsList>
+              <TabsTrigger value="all">Todas ({mockNotifications.length})</TabsTrigger>
+              <TabsTrigger value="unread">Não Lidas ({unreadCount})</TabsTrigger>
+              <TabsTrigger value="errors">Erros</TabsTrigger>
+              {(role === "pmo" || role === "coordinator") && (
+                <TabsTrigger value="disputes">Disputas ({disputeCount})</TabsTrigger>
+              )}
+            </TabsList>
+
+            {rolePermissions.canReportErrors && (
+              <Button
+                className="gap-2 bg-destructive hover:bg-destructive/90"
+                onClick={() => setShowReportForm(!showReportForm)}
+              >
+                <AlertCircle className="w-4 h-4" />
+                Reportar Erro
+                <Badge className="ml-1 bg-success text-success-foreground">+50 pts</Badge>
+              </Button>
             )}
-          </TabsList>
+          </div>
+
+            {/* Report Error Form */}
+            {showReportForm && (
+              <Card className="p-6 border-destructive/30 bg-destructive/5">
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-destructive">
+                  <AlertCircle className="w-5 h-5" />
+                  Reportar Erro em Outro Setor
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Ao reportar um erro, seu setor ganha +50 pontos de auditoria. O setor notificado pode reconhecer a falha ou contestar (disputa será julgada pelo PMO).
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Setor Notificado</label>
+                    <Select value={selectedSector} onValueChange={setSelectedSector}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o setor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sectors.filter(s => s !== userSector && s !== "Cardiologia").map(sector => (
+                          <SelectItem key={sector} value={sector}>{sector}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Tipo de Erro</label>
+                    <Select value={errorType} onValueChange={setErrorType}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="alert">Alerta - Erro já estava no checklist (-50 pts)</SelectItem>
+                        <SelectItem value="absence">Ausência - Erro não estava no checklist (-100 pts)</SelectItem>
+                        <SelectItem value="aggravation">Agravamento - Erro recorrente (-150 pts)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="mb-4">
+                  <label className="text-sm font-medium mb-2 block">Descrição do Erro</label>
+                  <Textarea
+                    placeholder="Descreva detalhadamente o erro encontrado..."
+                    value={errorDescription}
+                    onChange={(e) => setErrorDescription(e.target.value)}
+                    rows={3}
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="text-sm font-medium mb-2 block">Evidência (opcional)</label>
+                  <Button variant="outline" className="gap-2">
+                    <Upload className="w-4 h-4" />
+                    Anexar Arquivo
+                  </Button>
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Button variant="outline" onClick={() => setShowReportForm(false)}>
+                    Cancelar
+                  </Button>
+                  <Button className="gap-2 bg-destructive hover:bg-destructive/90">
+                    <Send className="w-4 h-4" />
+                    Enviar Notificação
+                  </Button>
+                </div>
+              </Card>
+            )}
 
           <TabsContent value={activeTab} className="mt-6">
             <div className="space-y-3">
               {mockNotifications.map((notification) => (
-                <Card 
-                  key={notification.id} 
-                  className={`p-5 hover:border-primary/50 transition-all ${
-                    !notification.read ? 'border-primary/30 bg-primary/5' : ''
-                  }`}
+                <Card
+                  key={notification.id}
+                  className={`p-5 hover:border-primary/50 transition-all ${!notification.read ? 'border-primary/30 bg-primary/5' : ''
+                    }`}
                 >
                   <div className="flex items-start gap-4">
-                    <div className={`p-3 rounded-lg ${
-                      notification.type === "error" ? "bg-destructive/10" :
+                    <div className={`p-3 rounded-lg ${notification.type === "error" ? "bg-destructive/10" :
                       notification.type === "success" ? "bg-success/10" :
-                      notification.type === "ranking" ? "bg-gold/10" :
-                      notification.type === "task" ? "bg-primary/10" :
-                      notification.type === "dispute" ? "bg-warning/10" :
-                      "bg-secondary/10"
-                    }`}>
+                        notification.type === "ranking" ? "bg-gold/10" :
+                          notification.type === "task" ? "bg-primary/10" :
+                            notification.type === "dispute" ? "bg-warning/10" :
+                              "bg-secondary/10"
+                      }`}>
                       {getNotificationIcon(notification.type)}
                     </div>
 
@@ -408,7 +398,7 @@ export default function Notifications() {
                             {notification.errorType && getErrorTypeBadge(notification.errorType)}
                             {notification.points && (
                               <Badge variant="outline" className={
-                                notification.points > 0 
+                                notification.points > 0
                                   ? "bg-success/10 text-success border-success/30"
                                   : "bg-destructive/10 text-destructive border-destructive/30"
                               }>
@@ -418,11 +408,11 @@ export default function Notifications() {
                             {notification.status && (
                               <Badge variant="outline" className={
                                 notification.status === "pending" ? "bg-warning/10 text-warning border-warning/30" :
-                                notification.status === "disputed" ? "bg-destructive/10 text-destructive border-destructive/30" :
-                                "bg-success/10 text-success border-success/30"
+                                  notification.status === "disputed" ? "bg-destructive/10 text-destructive border-destructive/30" :
+                                    "bg-success/10 text-success border-success/30"
                               }>
                                 {notification.status === "pending" ? "Pendente" :
-                                 notification.status === "disputed" ? "Em Disputa" : "Aceito"}
+                                  notification.status === "disputed" ? "Em Disputa" : "Aceito"}
                               </Badge>
                             )}
                             <span className="text-xs text-muted-foreground">
